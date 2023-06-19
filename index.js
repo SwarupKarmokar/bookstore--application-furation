@@ -9,6 +9,9 @@ const app = express();
 // MIDDLEWARE 
 app.use(express.json());
 
+// ADDING ROUTES TO THE APP 
+app.use('/api/items', require('./routes/itemRoutes'))
+
 
 // ADDING TO THE PORT 
 app.listen(port, (err) => {
