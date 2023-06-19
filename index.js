@@ -2,6 +2,9 @@ const express = require('express');
 const errorHandler = require('./middleware/errorHandler');
 require('dotenv').config();
 
+// CONNECTING DATABASE 
+require('./config/mongoose')
+
 // CREATING PORT FOR APP 
 const port = process.env.PORT || 5000;
 
