@@ -24,7 +24,14 @@ const getItem = asyncHandler(async (req, res) => {
 // @ACCESS: PUBLIC 
 
 const addItem = asyncHandler(async (req, res) => {
-    res.json("HI this is adding item page")
+    const { item } = req.body;
+
+    if (!item) {
+        res.status(400);
+        throw new Error("Please add item")
+    }
+
+    res.status(200).json("added successfully")
 })
 
 

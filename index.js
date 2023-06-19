@@ -1,4 +1,5 @@
 const express = require('express');
+const errorHandler = require('./middleware/errorHandler');
 require('dotenv').config();
 
 // CREATING PORT FOR APP 
@@ -11,6 +12,9 @@ app.use(express.json());
 
 // ADDING ROUTES TO THE APP 
 app.use('/api/items', require('./routes/itemRoutes'))
+
+// CUSTOM MIDDLEWARE 
+app.use(errorHandler)
 
 
 // ADDING TO THE PORT 
