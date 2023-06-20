@@ -14,6 +14,7 @@ const app = express();
 app.use(express.json());
 
 // ADDING ROUTES TO THE APP 
+app.use('/api/users', require('./routes/userRoutes'))
 app.use('/api/items', require('./routes/itemRoutes'))
 
 // CUSTOM MIDDLEWARE 
