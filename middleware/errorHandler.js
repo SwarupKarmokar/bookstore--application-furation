@@ -1,5 +1,6 @@
 const { constants } = require("../constants");
 
+// ITS HANDLE ERROR BASED ON STATUS CODE IF THERE ANY ERROR 
 const errorHandler = (err, req, res, next) => {
     const statusCode = res.statusCode ? res.statusCode : 500;
     switch (statusCode) {

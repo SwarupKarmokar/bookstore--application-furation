@@ -1,6 +1,8 @@
 const asyncHandler = require('express-async-handler');
-const jwt = require('json-web-token');
+const jwt = require('jsonwebtoken');
 
+
+// FOR PROTECTING OUR ROUTES WE CREATE A JWT VALIDATOR 
 const validateToken = asyncHandler(async (req, res, next) => {
     let token;
 

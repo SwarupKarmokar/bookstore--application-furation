@@ -1,67 +1,80 @@
+// CREATING USER CONTROLLER 
 const asyncHandler = require('express-async-handler');
-const bcrypt = require('bcrypt');
-const jwt = require('json-web-token');
-require('dotenv').config();
 const User = require('../models/usersSchema');
+const bcrypt = require('bcrypt');
+const jwt = require('jsonwebtoken');
+require('dotenv').config();
 
 
-// @DESC: REGISTERING A USER 
-// @ROUTE: POST /api/users/register
-// @ACCESS: PUBLIC 
+// desc: Register an user 
+// route: POST /api/user/register 
+// access: public 
 
 const registerUser = asyncHandler(async (req, res) => {
     const { name, email, password } = req.body;
 
     if (!name || !email || !password) {
         res.status(400);
-        throw new Error("All fields are mandatory")
+        throw new Error("All Fields Mandatory");
     }
 
-    const userAvailable = await User.findOne({ email })
+    const userAvailable = await User.findOne({ email });
+
     if (userAvailable) {
         res.status(400);
-        throw new Error("User already exists")
+        throw new Error("User Already Exists");
     }
 
-    const hashPassword = await bcrypt.hash(password, 10)
+    const hashPassword = await bcrypt.hash(password, 10);
 
-    const user = await User.create({ name, email, password: hashPassword })
 
-    if (user) {
-        res.status(200).json({ _id: user.id, name: user.name, email: user.email })
-    }
-    else {
-        res.status(400)
-        throw new Error("User data not valid")
-    }
+    const user = await User.create({
+        name, email, password: hashPassword
+    })
+
+    res.status(200).json({
+        message: "Successfully Registered",
+        data: { _id: user.id, name: user.name, email: user.email }
+    })
 })
 
 
-// @DESC: USER LOGIN 
-// @ROUTE: POST /api/users/login 
-// @ACCESS: PUBLIC 
+
+
+// desc: User Login 
+// route: POST /api/user/login 
+// access: public 
 
 const loginUser = asyncHandler(async (req, res) => {
     const { email, password } = req.body;
 
-    // Find the user by username
+    if (!email || !password) {
+        res.status(400);
+        throw new Error("All Fields Mandatory")
+    }
+
     const user = await User.findOne({ email });
 
-    // Check if the user exists
-    if (!user) {
-        return res.status(401).json({ message: 'Invalid username or password' });
+    // COMPARING PASSWORD WITH HASH PASSWORD 
+    if (user && bcrypt.compare(password, user.password)) {
+        const accessToken = jwt.sign(
+            {
+                user: {
+                    name: user.name,
+                    email: user.email,
+                    id: user.id
+                }
+            }, process.env.SECRET_KEY, { expiresIn: '3d' }
+        )
+        res.status(200).json({
+            token: accessToken
+        })
     }
 
-    // Check if the password is correct
-    const isPasswordValid = await bcrypt.compare(password, user.password);
-    if (!isPasswordValid) {
-        return res.status(401).json({ message: 'Invalid username or password' });
+    else {
+        res.status(401);
+        throw new Error("Email || Password not valid")
     }
-
-    // Generate a JWT token
-    const token = jwt.sign({ name: user.name }, process.env.SECRET_KEY, { expiresIn: '1h' });
-
-    res.status(200).json({ token });
 })
 
 

@@ -39,7 +39,7 @@ const addItem = asyncHandler(async (req, res) => {
         throw new Error("Please add item")
     }
 
-    const items = await Item.create({ item });
+    const items = await Item.create({ item, user_id: req.user.id });
 
     res.status(200).json(items)
 })
@@ -54,6 +54,11 @@ const updateItem = asyncHandler(async (req, res) => {
     if (!item) {
         res.status(404);
         throw new Error("Item not found")
+    }
+
+    if (item.user_id.toString() !== req.user.id) {
+        res.status(403);
+        throw new Error("User don't have permission to update other data")
     }
 
     const updatedItem = await Item.findByIdAndUpdate(req.params.id, req.body, { new: true })
@@ -71,6 +76,11 @@ const deleteItem = asyncHandler(async (req, res) => {
     if (!item) {
         res.status(404);
         throw new Error("Item not found")
+    }
+
+    if (item.user_id.toString() !== req.user.id) {
+        res.status(403);
+        throw new Error("User don't have permission to delete other data")
     }
 
     await Item.deleteOne({ _id: req.params.id })
